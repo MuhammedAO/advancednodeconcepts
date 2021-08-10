@@ -8,18 +8,19 @@ require("./models/User")
 require("./models/Blog")
 require("./services/passport")
 
-mongoose.connect(keys.mongoURI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useCreateIndex: true,
-  useFindAndModify: false
-})
-  .then(() => console.log('Db Connected'))
+mongoose
+  .connect(keys.mongoURI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true,
+    useFindAndModify: false,
+  })
+  .then(() => console.log("Db Connected"))
   .catch((err) => console.log(err))
 
 const app = express()
 
-app.use(express.json())
+app.use(express.json({ extended: false }))
 app.use(
   cookieSession({
     maxAge: 30 * 24 * 60 * 60 * 1000,
@@ -29,19 +30,19 @@ app.use(
 app.use(passport.initialize())
 app.use(passport.session())
 
-require("./routes/authRoutes")(app)
-require("./routes/blogRoutes")(app)
+app.use("/api/", require("./routes/authRoutes"))
+app.use("/auth", require("./routes/authRoutes"))
+app.use("/api/blogs", require("./routes/blogRoutes"))
 
 if (process.env.NODE_ENV === "production") {
-
-  // Set static folder   
+  // Set static folder
   // All the javascript and css files will be read and served from this folder
   app.use(express.static("client/build"))
 
   // index.html for all page routes,  html or routing and naviagtion
   app.get("*", (req, res) => {
     res.sendFile(path.resolve(__dirname, "../client", "build", "index.html"))
-  });
+  })
 }
 
 const PORT = process.env.PORT || 5000
