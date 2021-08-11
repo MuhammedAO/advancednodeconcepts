@@ -8,6 +8,8 @@ require("./models/User")
 require("./models/Blog")
 require("./services/passport")
 
+require("./services/cache")
+
 mongoose
   .connect(keys.mongoURI, {
     useNewUrlParser: true,
